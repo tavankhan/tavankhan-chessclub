@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бүртгэл — Таванхан Шатрын Клуб</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Толгой хэсэг -->
+  <header class="bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto flex items-center justify-between p-4">
+      <a href="index.html" class="text-2xl font-bold">♟ Таванхан Шатрын Клуб</a>
+      <nav class="space-x-6 hidden md:block">
+        <a href="index.html" class="hover:text-yellow-400">Нүүр</a>
+        <a href="training.html" class="hover:text-yellow-400">Сургалт</a>
+        <a href="events.html" class="hover:text-yellow-400">Тэмцээн</a>
+        <a href="register.html" class="text-yellow-400 font-semibold">Бүртгэл</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Бүртгэлийн форм -->
+  <section class="max-w-2xl mx-auto py-16 px-6 bg-white rounded-2xl shadow-md mt-12">
+    <h2 class="text-3xl font-bold mb-6 text-center">Онлайн бүртгэл</h2>
+    <form id="registerForm" class="space-y-4">
+      <input type="text" name="name" placeholder="Нэр" class="w-full p-3 border rounded-lg" required>
+      <input type="number" name="age" placeholder="Нас" class="w-full p-3 border rounded-lg" required>
+      <select name="level" class="w-full p-3 border rounded-lg" required>
+        <option value="">Төлөвшил сонгоно уу</option>
+        <option value="Анхан шат">Анхан шат</option>
+        <option value="Дунд шат">Дунд шат</option>
+        <option value="Ахисан шат">Ахисан шат</option>
+      </select>
+      <input type="email" name="email" placeholder="Имэйл" class="w-full p-3 border rounded-lg" required>
+      <select name="course" class="w-full p-3 border rounded-lg" required>
+        <option value="">Сургалт сонгоно уу</option>
+        <option value="Анхан шат">Анхан шат</option>
+        <option value="Дунд шат">Дунд шат</option>
+        <option value="Ахисан шат">Ахисан шат</option>
+      </select>
+      <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold">Бүртгүүлэх</button>
+    </form>
+  </section>
+
+  <!-- Доод хэсэг -->
+  <footer class="bg-black text-gray-400 text-center py-6 mt-12">
+    <p>© 2025 Таванхан Шатрын Клуб — Бүртгэл</p>
+  </footer>
+
+  <!-- Скрипт (Google Sheets + Server руу илгээх) -->
+  <script>
+const form = document.getElementById("registerForm");
+
+// Google Sheets Webhook URL
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx8qYgFiv8wk9f4us617n7jwc7ppZBdc8On-aTUqERmOVx5Bv3iHxOdMaB9Haa9ZPCN5Q/exec";
+
+// Сервер PHP URL
+const SERVER_PHP_URL = "register.php";
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  try {
+    // Google Sheets руу илгээх
+    const resSheet = await fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+    const resultSheet = await resSheet.json();
+    console.log("Google Sheets response:", resultSheet);
+
+    // Сервер руу илгээх
+    const resServer = await fetch(SERVER_PHP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    const resultServer = await resServer.json();
+    console.log("Server response:", resultServer);
+
+    alert("Амжилттай бүртгэгдлээ!");
+    form.reset();
+
+  } catch (error) {
+    console.error(error);
+    alert("Алдаа гарлаа: " + error);
+  }
+});
+</script>
